@@ -4,8 +4,8 @@
 <meta property="og:title" content="Test" />
 <meta property="og:description" content="This is a test embed" />
 <!-- Optional: Add a URL and Image for a better embed -->
-<meta property="og:url" content="[Your Website URL]" />
-<meta property="og:image" content="[URL to an image]" />
+<meta property="og:url" content="https://2012hhh2012.github.io" />
+<meta property="og:image" content="https://i.ibb.co/SDjC0F7F/2012hhh2012.jpg" />
 <!-- Optional: Add a color for the left border (Discord often uses theme-color too) -->
 <meta name="theme-color" content="#333" />
 <meta charset="UTF-8">
@@ -94,6 +94,14 @@ const REPO_NAME = '2012hhh2012.github.io';
 const BRANCH_NAME = 'main';
 const API_BASE_URL = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents`;
 
+// --- IGNORE LIST (like .gitignore) ---
+const IGNORE = [
+    'node_modules',
+    '.git',
+    'secret-folder',
+    'private.txt'
+];
+
 // --- Fetch and display expandable file tree ---
 async function fetchAndDisplayFileStructure(path = '', parentUl = null) {
     const url = path ? `${API_BASE_URL}/${path}?ref=${BRANCH_NAME}` : `${API_BASE_URL}?ref=${BRANCH_NAME}`;
@@ -113,6 +121,9 @@ async function fetchAndDisplayFileStructure(path = '', parentUl = null) {
         if (!parentUl) document.getElementById('file-list').innerHTML = '<h2>Root Folder (/) Contents</h2>';
 
         files.forEach(item => {
+            // Skip ignored files/folders
+            if (IGNORE.includes(item.name)) return;
+
             const li = document.createElement('li');
             const isDir = item.type === 'dir';
             li.innerHTML = `
