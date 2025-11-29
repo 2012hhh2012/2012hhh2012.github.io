@@ -10,7 +10,6 @@
 <meta name="theme-color" content="#333" />
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<video src="media/SUMMIT.mp4" controls></video>
 <title>Repository File Structure & Deploy Status</title>
 <style>
     body {
@@ -128,10 +127,18 @@ async function fetchAndDisplayFileStructure(path = '', parentUl = null) {
 
             const li = document.createElement('li');
             const isDir = item.type === 'dir';
+
+            // Construct proper download URL
+            const downloadUrl = isDir 
+                ? '#' 
+                : item.download_url 
+                    ? item.download_url 
+                    : `https://media.githubusercontent.com/media/${GITHUB_USERNAME}/${REPO_NAME}/${BRANCH_NAME}/${item.path}`;
+
             li.innerHTML = `
                 <span class="icon ${isDir ? 'dir-icon' : 'file-icon'}"></span>
                 <a href="${isDir ? '#' : item.html_url}" target="${isDir ? '' : '_blank'}">${item.name}${isDir ? '/' : ''}</a>
-                ${!isDir ? `<a href="${item.download_url}" class="download-btn" download="${item.name}">Download</a>` : ''}
+                ${!isDir ? `<a href="${downloadUrl}" class="download-btn" download="${item.name}">Download</a>` : ''}
             `;
 
             if (isDir) {
