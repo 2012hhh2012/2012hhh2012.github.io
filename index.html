@@ -86,7 +86,7 @@
     <p class="loading">Loading file structure...</p>
 </div>
 
-<p><em>Note: This content is dynamically loaded using the GitHub API and requires your repository to be public.</em></p>
+<p><em>Note: This content is dynamically loaded using the GitHub API and requires the repository to be public.</em></p>
 
 <script>
 const GITHUB_USERNAME = '2012hhh2012';
@@ -96,10 +96,10 @@ const API_BASE_URL = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAM
 
 // --- IGNORE LIST (like .gitignore) ---
 const IGNORE = [
-    'node_modules',
+    '.gitattributes',
     '.git',
-    'secret-folder',
-    'private.txt'
+    'index.html',
+    'index2.html'
 ];
 
 // --- Fetch and display expandable file tree ---
