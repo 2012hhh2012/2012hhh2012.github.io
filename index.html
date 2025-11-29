@@ -134,49 +134,24 @@ async function fetchAndDisplayFileStructure(path = '', parentUl = null) {
         const ul = parentUl || document.createElement('ul');
         if (!parentUl) document.getElementById('file-list').innerHTML = '<h2>Root Folder (/) Contents</h2>';
 
-        files.forEach(async item => {
+        files.forEach(item => {
+            // Skip ignored files/folders
             if (IGNORE.includes(item.name)) return;
 
             const li = document.createElement('li');
             const isDir = item.type === 'dir';
-            let isLFS = false;
-            let downloadUrl = '';
 
-            if (!isDir) {
-                // Try to detect LFS pointer
-                if (!item.download_url) {
-                    // If no download_url, assume it could be LFS
-                    downloadUrl = `https://media.githubusercontent.com/media/${GITHUB_USERNAME}/${REPO_NAME}/${BRANCH_NAME}/${item.path}`;
-                    isLFS = true;
-                } else {
-                    // Fetch small file content to check for LFS pointer
-                    try {
-                        const contentResp = await fetch(item.download_url);
-                        if (contentResp.ok) {
-                            const text = await contentResp.text();
-                            if (text.startsWith('version https://git-lfs.github.com/spec/v1')) {
-                                isLFS = true;
-                                downloadUrl = `https://media.githubusercontent.com/media/${GITHUB_USERNAME}/${REPO_NAME}/${BRANCH_NAME}/${item.path}`;
-                            } else {
-                                downloadUrl = item.download_url;
-                            }
-                        } else {
-                            downloadUrl = item.download_url;
-                        }
-                    } catch (err) {
-                        console.warn('Could not check LFS for', item.name, err);
-                        downloadUrl = item.download_url;
-                    }
-                }
-            }
+            // Construct proper download URL
+            const downloadUrl = isDir 
+                ? '#' 
+                : item.download_url 
+                    ? item.download_url 
+                    : `https://media.githubusercontent.com/media/${GITHUB_USERNAME}/${REPO_NAME}/${BRANCH_NAME}/${item.path}`;
 
             li.innerHTML = `
                 <span class="icon ${isDir ? 'dir-icon' : 'file-icon'}"></span>
-                <a href="${isDir ? '#' : item.html_url}" target="${isDir ? '' : '_blank'}">
-                    ${item.name}${isDir ? '/' : ''}
-                    ${isLFS ? '<span class="lfs-badge">LFS</span>' : ''}
-                </a>
-                ${!isDir && downloadUrl ? `<a href="${downloadUrl}" class="download-btn" download="${item.name}">Download</a>` : ''}
+                <a href="${isDir ? '#' : item.html_url}" target="${isDir ? '' : '_blank'}">${item.name}${isDir ? '/' : ''}</a>
+                ${!isDir ? `<a href="${downloadUrl}" class="download-btn" download="${item.name}">Download</a>` : ''}
             `;
 
             if (isDir) {
