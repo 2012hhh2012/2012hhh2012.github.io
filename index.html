@@ -1,212 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Repository File Structure & Deploy Status</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f6f8fa;
-        }
-        h1, h2 {
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 0.3em;
-            color: #24292e;
-        }
-        #file-list, #deploy-status {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        ul {
-            list-style-type: none;
-            padding-left: 20px;
-        }
-        li {
-            padding: 4px 0;
-            display: flex;
-            align-items: center;
-        }
-        .icon {
-            margin-right: 8px;
-            font-size: 1.1em;
-        }
-        a {
-            color: #0366d6;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .dir-icon:before {
-            content: '📁'; /* Folder emoji */
-        }
-        .file-icon:before {
-            content: '📄'; /* File emoji */
-        }
-        .download-btn {
-            margin-left: auto;
-            font-size: 0.9em;
-            padding: 2px 6px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            background-color: #fafafa;
-        }
-        .status-success { color: #28a745; font-weight: bold; }
-        .status-failure { color: #dc3545; font-weight: bold; }
-        .status-in-progress { color: #ffc107; font-weight: bold; }
-        .status-pending { color: #6c757d; font-weight: bold; }
-        .loading { color: #0366d6; }
-    </style>
+<meta property="og:title" content="Test" />
+<meta property="og:description" content="This is a test embed" />
+<!-- Optional: Add a URL and Image for a better embed -->
+<meta property="og:url" content="[Your Website URL]" />
+<meta property="og:image" content="[URL to an image]" />
+<!-- Optional: Add a color for the left border (Discord often uses theme-color too) -->
+<meta name="theme-color" content="#333" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repository File Structure & Deploy Status</title>
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f6f8fa;
+    }
+    h1, h2 {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 0.3em;
+        color: #24292e;
+    }
+    #file-list, #deploy-status {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    ul {
+        list-style-type: none;
+        padding-left: 20px;
+    }
+    li {
+        padding: 4px 0;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    .icon {
+        margin-right: 8px;
+        font-size: 1.1em;
+    }
+    a {
+        color: #0366d6;
+        text-decoration: none;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+    .dir-icon:before { content: '📁'; }
+    .file-icon:before { content: '📄'; }
+    .download-btn {
+        margin-left: auto;
+        font-size: 0.9em;
+        padding: 2px 6px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        background-color: #fafafa;
+    }
+    .status-success { color: #28a745; font-weight: bold; }
+    .status-failure { color: #dc3545; font-weight: bold; }
+    .status-in-progress { color: #ffc107; font-weight: bold; }
+    .status-pending { color: #6c757d; font-weight: bold; }
+    .loading { color: #0366d6; }
+    .nested { display: none; }
+    .expanded > .nested { display: block; }
+</style>
 </head>
 <body>
 
-    <h1>Repository File Structure</h1>
+<h1>Repository File Structure</h1>
 
-    <div id="deploy-status">
-        <p class="loading">Loading last deployment status...</p>
-    </div>
+<div id="deploy-status">
+    <p class="loading">Loading last deployment status...</p>
+</div>
 
-    <div id="file-list">
-        <p class="loading">Loading file structure...</p>
-    </div>
+<div id="file-list">
+    <p class="loading">Loading file structure...</p>
+</div>
 
-    <p><em>Note: This content is dynamically loaded using the GitHub API and requires your repository to be public.</em></p>
+<p><em>Note: This content is dynamically loaded using the GitHub API and requires your repository to be public.</em></p>
 
-    <script>
-        // --- CONFIGURATION: REPLACE THESE VALUES ---
-        const GITHUB_USERNAME = '2012hhh2012';
-        const REPO_NAME = '2012hhh2012.github.io';
-        const BRANCH_NAME = 'main'; // e.g., 'main' or 'master'
-        // -------------------------------------------
+<script>
+const GITHUB_USERNAME = '2012hhh2012';
+const REPO_NAME = '2012hhh2012.github.io';
+const BRANCH_NAME = 'main';
+const API_BASE_URL = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents`;
 
-        const API_BASE_URL = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents`;
-        const FILE_LIST_URL = `${API_BASE_URL}?ref=${BRANCH_NAME}`;
+// --- Fetch and display expandable file tree ---
+async function fetchAndDisplayFileStructure(path = '', parentUl = null) {
+    const url = path ? `${API_BASE_URL}/${path}?ref=${BRANCH_NAME}` : `${API_BASE_URL}?ref=${BRANCH_NAME}`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const files = await response.json();
+        if (!Array.isArray(files)) throw new Error('Invalid response');
 
-        // --- 1. Fetch and Display File Structure ---
-        async function fetchAndDisplayFileStructure() {
-            const fileListDiv = document.getElementById('file-list');
-            try {
-                const response = await fetch(FILE_LIST_URL);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const files = await response.json();
-                
-                if (!Array.isArray(files)) {
-                    fileListDiv.innerHTML = `<p>Error: Could not retrieve file list. Is the repository public? Check API response.</p>`;
-                    return;
-                }
-
-                let html = '<h2>Root Folder (/) Contents</h2><ul>';
-                
-                // Sort directories first, then files
-                files.sort((a, b) => {
-                    if (a.type === 'dir' && b.type !== 'dir') return -1;
-                    if (a.type !== 'dir' && b.type === 'dir') return 1;
-                    return a.name.localeCompare(b.name);
-                });
-
-                files.forEach(item => {
-                    const isDir = item.type === 'dir';
-                    const iconClass = isDir ? 'dir-icon' : 'file-icon';
-                    const downloadUrl = isDir ? '#' : item.download_url; // Directories don't have a direct download_url
-                    const target = isDir ? '' : '_blank';
-                    const nameDisplay = isDir ? `${item.name}/` : item.name;
-
-                    html += `
-                        <li>
-                            <span class="icon ${iconClass}"></span>
-                            <a href="${item.html_url}" target="${target}">${nameDisplay}</a>
-                            ${!isDir && downloadUrl ? `<a href="${downloadUrl}" class="download-btn" download="${item.name}">Download</a>` : ''}
-                        </li>
-                    `;
-                });
-
-                html += '</ul>';
-                fileListDiv.innerHTML = html;
-
-            } catch (error) {
-                console.error('Error fetching file structure:', error);
-                fileListDiv.innerHTML = `<p class="status-failure">Failed to load file structure: ${error.message}. Ensure GITHUB_USERNAME, REPO_NAME, and BRANCH_NAME are correct and the repo is public.</p>`;
-            }
-        }
-
-        // --- 2. Fetch and Display Last Deployment Status (Using GitHub Actions API for a common workflow) ---
-        // NOTE: Fetching *last successful deploy* is complex. This attempts to find the latest run on the default branch.
-        // For specific deployment methods (like Deployments API), this URL will need adjustment.
-        async function fetchAndDisplayLastDeploy() {
-            const deployStatusDiv = document.getElementById('deploy-status');
-            
-            // API endpoint to list workflow runs for the repository on a specific branch
-            const workflowsUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/actions/runs?branch=${BRANCH_NAME}&per_page=1`;
-
-            try {
-                const response = await fetch(workflowsUrl);
-                
-                if (!response.ok) {
-                    // If unauthorized or not found, it might be because the user has no Actions setup or the repo is private
-                    if (response.status === 404) {
-                        deployStatusDiv.innerHTML = `<p><strong>Last Deploy Status:</strong> Not configured or repository private. (Error 404: Workflow runs not found for branch ${BRANCH_NAME})</p>`;
-                    } else {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return;
-                }
-                
-                const data = await response.json();
-                
-                if (data.workflow_runs && data.workflow_runs.length > 0) {
-                    const latestRun = data.workflow_runs[0];
-                    const statusClass = getStatusClass(latestRun.conclusion);
-                    const date = new Date(latestRun.created_at).toLocaleString();
-
-                    deployStatusDiv.innerHTML = `
-                        <h2>Last Deployment Status</h2>
-                        <p><strong>Status:</strong> <span class="${statusClass}">${latestRun.conclusion ? latestRun.conclusion : 'In Progress'}</span></p>
-                        <p><strong>Workflow:</strong> ${latestRun.name}</p>
-                        <p><strong>Triggered At:</strong> ${date}</p>
-                        <p><strong>Check Run:</strong> <a href="${latestRun.html_url}" target="_blank">View Run Details</a></p>
-                    `;
-                } else {
-                    deployStatusDiv.innerHTML = `<p><strong>Last Deployment Status:</strong> No recent workflow runs found on branch ${BRANCH_NAME}.</p>`;
-                }
-
-            } catch (error) {
-                console.error('Error fetching deployment status:', error);
-                deployStatusDiv.innerHTML = `<p class="status-failure">Failed to load deployment status: ${error.message}.</p>`;
-            }
-        }
-
-        function getStatusClass(conclusion) {
-            if (!conclusion) return 'status-in-progress'; // Assume in progress if no conclusion yet
-            switch (conclusion.toLowerCase()) {
-                case 'success':
-                    return 'status-success';
-                case 'failure':
-                    return 'status-failure';
-                case 'cancelled':
-                    return 'status-pending';
-                default:
-                    return 'status-in-progress';
-            }
-        }
-
-        // Run the functions when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchAndDisplayFileStructure();
-            fetchAndDisplayLastDeploy();
+        files.sort((a, b) => {
+            if(a.type === 'dir' && b.type !== 'dir') return -1;
+            if(a.type !== 'dir' && b.type === 'dir') return 1;
+            return a.name.localeCompare(b.name);
         });
-    </script>
+
+        const ul = parentUl || document.createElement('ul');
+        if (!parentUl) document.getElementById('file-list').innerHTML = '<h2>Root Folder (/) Contents</h2>';
+
+        files.forEach(item => {
+            const li = document.createElement('li');
+            const isDir = item.type === 'dir';
+            li.innerHTML = `
+                <span class="icon ${isDir ? 'dir-icon' : 'file-icon'}"></span>
+                <a href="${isDir ? '#' : item.html_url}" target="${isDir ? '' : '_blank'}">${item.name}${isDir ? '/' : ''}</a>
+                ${!isDir ? `<a href="${item.download_url}" class="download-btn" download="${item.name}">Download</a>` : ''}
+            `;
+
+            if (isDir) {
+                const nestedUl = document.createElement('ul');
+                nestedUl.classList.add('nested');
+                li.appendChild(nestedUl);
+
+                li.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    li.classList.toggle('expanded');
+                    if (!nestedUl.hasChildNodes()) {
+                        await fetchAndDisplayFileStructure(item.path, nestedUl);
+                    }
+                });
+            }
+
+            ul.appendChild(li);
+        });
+
+        if (!parentUl) document.getElementById('file-list').appendChild(ul);
+
+    } catch (error) {
+        console.error('Error fetching file structure:', error);
+        if (!parentUl) document.getElementById('file-list').innerHTML = `<p class="status-failure">Failed to load file structure: ${error.message}</p>`;
+    }
+}
+
+// --- Fetch and display last deployment ---
+async function fetchAndDisplayLastDeploy() {
+    const deployStatusDiv = document.getElementById('deploy-status');
+    const workflowsUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/actions/runs?branch=${BRANCH_NAME}&per_page=1`;
+
+    try {
+        const response = await fetch(workflowsUrl);
+        if (!response.ok) {
+            deployStatusDiv.innerHTML = `<p><strong>Last Deploy Status:</strong> Not configured or repository private. (HTTP ${response.status})</p>`;
+            return;
+        }
+        const data = await response.json();
+        if (data.workflow_runs?.length > 0) {
+            const latestRun = data.workflow_runs[0];
+            const statusClass = getStatusClass(latestRun.conclusion);
+            const date = new Date(latestRun.created_at).toLocaleString();
+            deployStatusDiv.innerHTML = `
+                <h2>Last Deployment Status</h2>
+                <p><strong>Status:</strong> <span class="${statusClass}">${latestRun.conclusion || 'In Progress'}</span></p>
+                <p><strong>Workflow:</strong> ${latestRun.name}</p>
+                <p><strong>Triggered At:</strong> ${date}</p>
+                <p><strong>Check Run:</strong> <a href="${latestRun.html_url}" target="_blank">View Run Details</a></p>
+            `;
+        } else {
+            deployStatusDiv.innerHTML = `<p><strong>Last Deployment Status:</strong> No recent workflow runs found.</p>`;
+        }
+    } catch (error) {
+        console.error('Error fetching deployment status:', error);
+        deployStatusDiv.innerHTML = `<p class="status-failure">Failed to load deployment status: ${error.message}</p>`;
+    }
+}
+
+function getStatusClass(conclusion) {
+    if (!conclusion) return 'status-in-progress';
+    switch (conclusion.toLowerCase()) {
+        case 'success': return 'status-success';
+        case 'failure': return 'status-failure';
+        case 'cancelled': return 'status-pending';
+        default: return 'status-in-progress';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchAndDisplayFileStructure();
+    fetchAndDisplayLastDeploy();
+});
+</script>
 
 </body>
 </html>
