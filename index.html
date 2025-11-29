@@ -72,6 +72,19 @@
     .loading { color: #0366d6; }
     .nested { display: none; }
     .expanded > .nested { display: block; }
+    .lfs-badge {
+        display: inline-block;
+        background-color: #6f42c1; /* GitHub purple */
+        color: white;
+        font-size: 10px;
+        font-weight: bold;
+        padding: 0 4px;
+        border-radius: 3px;
+        margin-left: 4px;
+        line-height: 1.2;
+        vertical-align: text-bottom;
+        font-family: Arial, sans-serif;
+    }
 </style>
 </head>
 <body>
@@ -161,14 +174,7 @@ async function fetchAndDisplayFileStructure(path = '', parentUl = null) {
                 <span class="icon ${isDir ? 'dir-icon' : 'file-icon'}"></span>
                 <a href="${isDir ? '#' : item.html_url}" target="${isDir ? '' : '_blank'}">
                     ${item.name}${isDir ? '/' : ''}
-                    ${isLFS ? `
-                        <span class="lfs-icon" style="display:inline-block;width:16px;height:16px;margin-left:6px;vertical-align:middle;">
-                        <svg viewBox="0 0 32 32" fill="#6f42c1" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="16" cy="16" r="16"/>
-                            <text x="16" y="21" font-size="14" text-anchor="middle" fill="white" font-family="Arial, sans-serif">LFS</text>
-                        </svg>
-                        </span>
-                    ` : ''}
+                    ${isLFS ? '<span class="lfs-badge">LFS</span>' : ''}
                 </a>
                 ${!isDir && downloadUrl ? `<a href="${downloadUrl}" class="download-btn" download="${item.name}">Download</a>` : ''}
             `;
