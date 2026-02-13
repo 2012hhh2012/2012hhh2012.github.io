@@ -33,57 +33,7 @@
           },
           "---",
           {
-            opcode: 'nodeSetX',
-            blockType: Scratch.BlockType.COMMAND,
-            text: 'set window x to [X] (node)',
-            arguments: { X: { type: 'number', defaultValue: 0 } }
-          },
-          {
-            opcode: 'nodeSetY',
-            blockType: Scratch.BlockType.COMMAND,
-            text: 'set window y to [Y] (node)',
-            arguments: { Y: { type: 'number', defaultValue: 0 } }
-          },
-          {
-            opcode: 'nodeSetW',
-            blockType: Scratch.BlockType.COMMAND,
-            text: 'set window width to [W] (node)',
-            arguments: { W: { type: 'number', defaultValue: 480 } }
-          },
-          {
-            opcode: 'nodeSetH',
-            blockType: Scratch.BlockType.COMMAND,
-            text: 'set window height to [H] (node)',
-            arguments: { H: { type: 'number', defaultValue: 360 } }
-          },
-          "---",
-          {
-            opcode: 'nodeChangeX',
-            blockType: Scratch.BlockType.COMMAND,
-            text: 'change window x by [X] (node)',
-            arguments: { X: { type: 'number', defaultValue: 10 } }
-          },
-          {
-            opcode: 'nodeChangeY',
-            blockType: Scratch.BlockType.COMMAND,
-            text: 'change window y by [Y] (node)',
-            arguments: { Y: { type: 'number', defaultValue: 10 } }
-          },
-          {
-            opcode: 'nodeChangeW',
-            blockType: Scratch.BlockType.COMMAND,
-            text: 'change window width by [W] (node)',
-            arguments: { W: { type: 'number', defaultValue: 10 } }
-          },
-          {
-            opcode: 'nodeChangeH',
-            blockType: Scratch.BlockType.COMMAND,
-            text: 'change window height by [H] (node)',
-            arguments: { H: { type: 'number', defaultValue: 10 } }
-          },
-          "---",
-          {
-            opcode: 'nodeopenfile',
+            opcode: 'nodeOpenFile',
             blockType: Scratch.BlockType.COMMAND,
             text: 'Open file [PATH] in a new window (node)',
             arguments: {
@@ -92,7 +42,7 @@
           },
           "---",
           {
-            opcode: 'nodeminimizeWindow',
+            opcode: 'nodeMinimizeWindow',
             blockType: Scratch.BlockType.COMMAND,
             text: 'Minimize Window (node)'
           },
@@ -136,40 +86,15 @@
       });
     }
 
-    nodeSetX(args) { this._send('set-async', { type: 'x', value: args.X }); }
-    nodeSetY(args) { this._send('set-async', { type: 'y', value: args.Y }); }
-    nodeSetW(args) { this._send('set-async', { type: 'w', value: args.W }); }
-    nodeSetH(args) { this._send('set-async', { type: 'h', value: args.H }); }
-
-    _send(channel, payload) {
-      if (typeof require !== 'undefined') {
-        const { ipcRenderer } = require('electron');
-        ipcRenderer.send(`window-${channel}`, payload);
-      }
-    }
-    
-    nodeChangeX(args) { this._sendMove('x', args.X); }
-    nodeChangeY(args) { this._sendMove('y', args.Y); }
-    nodeChangeW(args) { this._sendMove('w', args.W); }
-    nodeChangeH(args) { this._sendMove('h', args.H); }
-
-    _sendMove(type, value) {
-      if (typeof require !== 'undefined') {
-        const { ipcRenderer } = require('electron');
-        ipcRenderer.send('window-move-async', { type, value });
-      }
-    }
-
     async openfile(args) {
       if (await Scratch.canOpenWindow(args.PATH)) {
         await Scratch.openWindow(args.PATH, 'width=400,height=400');
       } else {
         console.error("TurboWarp blocked the popup.");
-        alert("TurboWarp blocked the popup.");
       }
     }
 
-    nodeopenfile(args) {
+    nodeOpenFile(args) {
       if (typeof require !== 'undefined') {
         const { ipcRenderer } = require('electron');
         // Changed args.FILE to args.PATH to match getInfo above
@@ -179,7 +104,7 @@
       }
     }
 
-    nodeminimizeWindow() {
+    nodeMinimizeWindow() {
       if (typeof require !== 'undefined') {
         const { ipcRenderer } = require('electron');
         ipcRenderer.send('minimize-window');
