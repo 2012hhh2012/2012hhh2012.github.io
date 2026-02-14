@@ -25,10 +25,21 @@
             blockType: Scratch.BlockType.COMMAND,
             text: 'set window x:[X] y:[Y] w:[W] h:[H] (node)',
             arguments: {
-              X: { type: 'number', defaultValue: 0 },
-              Y: { type: 'number', defaultValue: 0 },
-              W: { type: 'number', defaultValue: 480 },
-              H: { type: 'number', defaultValue: 360 }
+              X: { type: Scratch.ArgumentType.NUMBER, defaultValue: 0 },
+              Y: { type: Scratch.ArgumentType.NUMBER, defaultValue: 0 },
+              W: { type: Scratch.ArgumentType.NUMBER, defaultValue: 480 },
+              H: { type: Scratch.ArgumentType.NUMBER, defaultValue: 360 }
+            }
+          },
+          {
+            opcode: 'SetWindow',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'set window x: [X] y: [Y] w: [W] h: [H]',
+            arguments: {
+              X: { type: Scratch.ArgumentType.NUMBER, defaultValue: 0 },
+              Y: { type: Scratch.ArgumentType.NUMBER, defaultValue: 0 },
+              W: { type: Scratch.ArgumentType.NUMBER, defaultValue: 480 },
+              H: { type: Scratch.ArgumentType.NUMBER, defaultValue: 360 }
             }
           },
           "---",
@@ -37,7 +48,7 @@
             blockType: Scratch.BlockType.COMMAND,
             text: 'Open file [PATH] in a new window (node)',
             arguments: {
-              PATH: { type: 'string', defaultValue: 'index.html' }
+              PATH: { type: Scratch.ArgumentType.STRING, defaultValue: 'index.html' }
             }
           },
           "---",
@@ -84,6 +95,17 @@
         w: Math.round(args.W),
         h: Math.round(args.H)
       });
+    }
+
+    SetWindow(args) {
+      const x = Number(args.X) || 0;
+      const y = Number(args.Y) || 0;
+      const w = Number(args.W) || 480;
+      const h = Number(args.H) || 360;
+
+      // Uses standard Browser Web APIs
+      window.moveTo(x, y);
+      window.resizeTo(w, h);
     }
 
     nodeMinimizeWindow() {
