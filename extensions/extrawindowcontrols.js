@@ -79,22 +79,30 @@
     nodeMaximize() {
       if (typeof require !== 'undefined') {
         require('electron').ipcRenderer.send('window-maximize');
+      } else {
+        console.warn("Electron not detected. Cannot maximize.");
       }
     }
 
     nodeUnmaximize() {
       if (typeof require !== 'undefined') {
         require('electron').ipcRenderer.send('window-unmaximize');
+      } else {
+        console.warn("Electron not detected. Cannot unmaximize.");
       }
     }
 
     nodeSetWindow(args) {
-      this._send('window-set-all', {
-        x: Math.round(args.X),
-        y: Math.round(args.Y),
-        w: Math.round(args.W),
-        h: Math.round(args.H)
-      });
+      if (typeof require !== 'undefined') {
+        require('electron').ipcRenderer.send('window-set-all', {
+          x: Math.round(args.X),
+          y: Math.round(args.Y),
+          w: Math.round(args.W),
+          h: Math.round(args.H)
+        });
+      } else {
+        console.warn("Electron not detected. Cannot set window position.");
+      }
     }
 
     SetWindow(args) {
