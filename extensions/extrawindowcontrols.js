@@ -78,7 +78,7 @@
     }
 
     nodeSetWindow(args) {
-      this._send('update-all', {
+      this._send('window-set-all', {
         x: Math.round(args.X),
         y: Math.round(args.Y),
         w: Math.round(args.W),
@@ -86,33 +86,24 @@
       });
     }
 
-    async openfile(args) {
-      if (await Scratch.canOpenWindow(args.PATH)) {
-        await Scratch.openWindow(args.PATH, 'width=400,height=400');
-      } else {
-        console.error("TurboWarp blocked the popup.");
-      }
-    }
-
-    nodeOpenFile(args) {
-      if (typeof require !== 'undefined') {
-        const { ipcRenderer } = require('electron');
-        // Changed args.FILE to args.PATH to match getInfo above
-        ipcRenderer.send('open-new-window', args.PATH);
-      } else {
-        console.warn("Electron not detected. Cannot open new window.");
-      }
-    }
-
     nodeMinimizeWindow() {
       if (typeof require !== 'undefined') {
         const { ipcRenderer } = require('electron');
-        ipcRenderer.send('minimize-window');
+        ipcRenderer.send('window-minimize');
       } else {
         console.warn("Electron not detected. Cannot minimize.");
       }
     }
     
+    nodeOpenFile(args) {
+      if (typeof require !== 'undefined') {
+        const { ipcRenderer } = require('electron');
+        // Changed args.FILE to args.PATH to match getInfo above
+        ipcRenderer.send('window-open-new-window', args.PATH);
+      } else {
+        console.warn("Electron not detected. Cannot open new window.");
+      }
+    }
   }
   Scratch.extensions.register(new ExtraWindowControls());
 })(Scratch);
