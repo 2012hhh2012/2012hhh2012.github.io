@@ -19,6 +19,11 @@
             blockType: Scratch.BlockType.BOOLEAN,
             text: 'can use node.js?'
           },
+          {
+            opcode: 'getTitleBarHeight',
+            blockType: Scratch.BlockType.REPORTER,
+            text: 'title bar height'
+          },
           "---",
           {
             opcode: 'nodeSetWindow',
@@ -74,6 +79,11 @@
     canUseNode() {
       // Checks if we are in an environment that supports 'require' (Electron/Node)
       return (typeof require !== 'undefined');
+    }
+
+    getTitleBarHeight() {
+      // Returns the difference between the whole window and the game area
+      return window.outerHeight - window.innerHeight;
     }
 
     nodeMaximize() {
