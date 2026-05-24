@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GET Parameters · Copy each value</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #10131f 0%, #0a0d16 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, monospace;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #eef2ff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* header section – minimal, only essential */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #252b3e;
+        }
+
+        .title h1 {
+            font-size: 1.6rem;
+            font-weight: 500;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .title h1 span {
+            background: #1e2a3e;
+            padding: 2px 10px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: #8fb0e0;
+        }
+
+        .param-stats {
+            background: #1a1f2e;
+            padding: 0.3rem 1rem;
+            border-radius: 60px;
+            font-size: 0.75rem;
+            font-family: monospace;
+            color: #b9d0ff;
+        }
+
+        /* main card */
+        .card {
+            background: #0f121c;
+            border-radius: 1.5rem;
+            border: 1px solid #262d42;
+            overflow: hidden;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.4);
+        }
+
+        /* params table */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .params-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .params-table th {
+            text-align: left;
+            padding: 1rem 1.2rem;
+            background: #0b0e17;
+            color: #b9ceff;
+            font-weight: 500;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #1e253b;
+        }
+
+        .params-table td {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid #1a1f2c;
+            vertical-align: middle;
+            word-break: break-word;
+        }
+
+        .params-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .param-name {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-weight: 600;
+            background: #181e2c;
+            padding: 0.2rem 0.8rem;
+            border-radius: 24px;
+            display: inline-block;
+            font-size: 0.8rem;
+            color: #9bbdf0;
+        }
+
+        .value-cell {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.8rem;
+            justify-content: space-between;
+        }
+
+        .value-content {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            background: #06080f;
+            padding: 0.4rem 0.9rem;
+            border-radius: 12px;
+            color: #e2edff;
+            word-break: break-all;
+            white-space: pre-wrap;
+            flex: 1;
+            font-size: 0.8rem;
+            border: 1px solid #252b3e;
+        }
+
+        .copy-value-btn {
+            background: #1e253a;
+            border: none;
+            color: #bfd6ff;
+            font-size: 0.7rem;
+            font-family: monospace;
+            padding: 0.3rem 0.9rem;
+            border-radius: 30px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        .copy-value-btn:hover {
+            background: #2f3a58;
+            color: white;
+            transform: scale(0.97);
+        }
+
+        .copy-value-btn.copied {
+            background: #1c6e3c;
+            color: white;
+            border-color: #3ba876;
+        }
+
+        /* array items styling (for duplicate/array values) */
+        .array-values {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .array-item {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.6rem;
+            justify-content: space-between;
+            background: #080b12;
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            border-left: 2px solid #2f4b7c;
+        }
+
+        .array-index {
+            font-size: 0.65rem;
+            color: #7e95c9;
+            font-weight: 500;
+            min-width: 40px;
+        }
+
+        .array-value-text {
+            font-family: monospace;
+            word-break: break-all;
+            flex: 1;
+            color: #d3e2ff;
+            font-size: 0.8rem;
+        }
+
+        .empty-value {
+            color: #7c8bb0;
+            font-style: italic;
+        }
+
+        /* empty state */
+        .empty-state {
+            padding: 3rem 1.5rem;
+            text-align: center;
+            background: #0b0e16;
+        }
+
+        .empty-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            color: #8d9fd1;
+            font-family: monospace;
+        }
+
+        /* url preview footer */
+        .url-footer {
+            padding: 1rem 1.5rem;
+            background: #080b12;
+            border-top: 1px solid #1a1f30;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            font-size: 0.7rem;
+            color: #859bc2;
+        }
+
+        .query-preview {
+            font-family: monospace;
+            background: #00000033;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            word-break: break-all;
+        }
+
+        @media (max-width: 680px) {
+            body { padding: 1rem; }
+            .params-table th, .params-table td { padding: 0.8rem; }
+            .value-cell { flex-direction: column; align-items: flex-start; }
+            .copy-value-btn { align-self: flex-end; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="title">
+            <h1>🔍 GET inspector <span>copy each value</span></h1>
+        </div>
+        <div class="param-stats" id="paramStats">— parameters</div>
+    </div>
+
+    <div class="card">
+        <div class="table-wrapper" id="paramsTableContainer">
+            <!-- dynamic content -->
+        </div>
+        <div class="url-footer">
+            <span>📌 current request URL query:</span>
+            <div class="query-preview" id="urlQueryPreview"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- helper: parse GET params (handles arrays, duplicates, edge cases) ----------
+        function parseAllGetParams(searchString) {
+            if (!searchString || searchString === '' || searchString === '?') {
+                return {};
+            }
+            const query = searchString.startsWith('?') ? searchString.substring(1) : searchString;
+            if (query.length === 0) return {};
+
+            const params = {};
+            const pairs = query.split('&');
+            for (let pair of pairs) {
+                if (pair === '') continue;
+                let [key, val] = pair.split('=');
+                if (key === undefined) continue;
+
+                let decodedKey, decodedVal;
+                try {
+                    decodedKey = decodeURIComponent(key);
+                    decodedVal = (val !== undefined) ? decodeURIComponent(val) : '';
+                } catch(e) {
+                    decodedKey = key;
+                    decodedVal = (val !== undefined) ? val : '';
+                }
+
+                if (params.hasOwnProperty(decodedKey)) {
+                    if (Array.isArray(params[decodedKey])) {
+                        params[decodedKey].push(decodedVal);
+                    } else {
+                        params[decodedKey] = [params[decodedKey], decodedVal];
+                    }
+                } else {
+                    params[decodedKey] = decodedVal;
+                }
+            }
+            return params;
+        }
+
+        // escape HTML to prevent injection
+        function escapeHtml(str) {
+            if (typeof str !== 'string') str = String(str);
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, c => c);
+        }
+
+        // copy text to clipboard with visual feedback on the specific button
+        async function copyToClipboard(text, buttonElement) {
+            if (!text && text !== '') text = '';
+            const originalText = buttonElement.innerHTML;
+            const originalClass = buttonElement.className;
+            try {
+                await navigator.clipboard.writeText(text);
+                // visual feedback on that button
+                buttonElement.innerHTML = '✅ Copied!';
+                buttonElement.classList.add('copied');
+                setTimeout(() => {
+                    buttonElement.innerHTML = originalText;
+                    buttonElement.classList.remove('copied');
+                }, 1200);
+            } catch (err) {
+                console.error('Copy failed: ', err);
+                buttonElement.innerHTML = '❌ Error';
+                setTimeout(() => {
+                    buttonElement.innerHTML = originalText;
+                }, 1000);
+            }
+        }
+
+        // generate a unique ID for each copy button (or data attribute)
+        // render parameter rows: handle primitives and array values each with its own copy button
+        function renderParametersTable(paramsMap) {
+            const container = document.getElementById('paramsTableContainer');
+            const statsSpan = document.getElementById('paramStats');
+            const paramCount = Object.keys(paramsMap).length;
+            statsSpan.textContent = `${paramCount} param${paramCount !== 1 ? 's' : ''}`;
+
+            // update url preview (show query string)
+            const queryRaw = window.location.search || '(empty)';
+            const urlPreview = document.getElementById('urlQueryPreview');
+            urlPreview.textContent = queryRaw.length > 80 ? queryRaw.substring(0, 77) + '…' : queryRaw;
+            if (queryRaw.length > 80) urlPreview.title = queryRaw;
+
+            if (paramCount === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <p>No GET parameters found in the request URL</p>
+                        <p style="margin-top: 8px; font-size:0.7rem;">Try appending ?name=value&active=true</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // sort keys alphabetically
+            const sortedKeys = Object.keys(paramsMap).sort((a, b) => a.localeCompare(b));
+            let rowsHtml = '';
+
+            for (let key of sortedKeys) {
+                const rawValue = paramsMap[key];
+                const safeKey = escapeHtml(key);
+                const isArray = Array.isArray(rawValue);
+
+                if (!isArray) {
+                    // single value row
+                    const valueStr = (rawValue === undefined || rawValue === null) ? '' : String(rawValue);
+                    const displayValue = (valueStr === '') ? '<span class="empty-value">∅ empty string</span>' : escapeHtml(valueStr);
+                    const copyText = valueStr; // what will be copied
+
+                    rowsHtml += `
+                        <tr>
+                            <td style="width: 30%;"><span class="param-name">${safeKey}</span></td>
+                            <td>
+                                <div class="value-cell">
+                                    <div class="value-content">${displayValue}</div>
+                                    <button class="copy-value-btn" data-copy-value="${escapeHtml(copyText.replace(/"/g, '&quot;'))}" data-key="${safeKey}">📋 Copy value</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    // ARRAY: multiple values for same key, each gets its own copy button
+                    const arrayValues = rawValue;
+                    // Build a custom cell that shows each array item with separate copy
+                    let arrayItemsHtml = `<div class="array-values">`;
+                    for (let idx = 0; idx < arrayValues.length; idx++) {
+                        const item = arrayValues[idx];
+                        const itemStr = (item === undefined || item === null) ? '' : String(item);
+                        const displayItem = (itemStr === '') ? '<span class="empty-value">(empty)</span>' : escapeHtml(itemStr);
+                        const copyTextItem = itemStr;
+                        // each array item row
+                        arrayItemsHtml += `
+                            <div class="array-item">
+                                <span class="array-index">[${idx}]</span>
+                                <span class="array-value-text">${displayItem}</span>
+                                <button class="copy-value-btn copy-array-btn" data-copy-value="${escapeHtml(copyTextItem.replace(/"/g, '&quot;'))}" data-key="${safeKey}[${idx}]">📋 Copy value</button>
+                            </div>
+                        `;
+                    }
+                    arrayItemsHtml += `</div>`;
+                    rowsHtml += `
+                        <tr>
+                            <td style="vertical-align: top;"><span class="param-name">${safeKey} <span style="font-size:0.6rem; opacity:0.7;">(array)</span></span></td>
+                            <td style="padding: 0.8rem 1.2rem;">${arrayItemsHtml}</td>
+                        </tr>
+                    `;
+                }
+            }
+
+            const tableHtml = `
+                <table class="params-table">
+                    <thead>
+                        <tr><th>Parameter name</th><th>Value &nbsp; <span style="font-weight:normal;">(click copy button per value)</span></th></tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = tableHtml;
+
+            // attach event listeners to all copy buttons (single + array buttons)
+            const allCopyButtons = document.querySelectorAll('.copy-value-btn');
+            allCopyButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const copyText = btn.getAttribute('data-copy-value');
+                    if (copyText !== null && copyText !== undefined) {
+                        // decode any HTML entities we stored (we stored escaped but clipboard should get raw string)
+                        // because we used escapeHtml for safety but stored raw string inside attribute using escapeHtml? Actually we stored escaped but need original string.
+                        // Better: retrieve from the decoded data attribute. We stored with escapeHtml to avoid XSS, but we need original raw text.
+                        // Let's store raw text in a different attribute: 'data-raw-value' will be safer.
+                        // to fix properly: re-read from the data-raw-value we will set now. But the previous approach stored escaped.
+                        // I'll rework: set both data-raw-value with original string (unescaped) to guarantee copy works correctly.
+                    }
+                });
+            });
+
+            // RE-ATTACH PROPERLY: Because we need the original raw string to copy (not escaped version)
+            // I'll override: fetch each button and set correct raw text from param map again? easier: re-select and attach using closure with known values.
+            // Actually we stored the real string inside data-copy-value but escaped for html safety. For copy we must unescape.
+            // Let's fix by adding a second pass: read from data-copy-value and decode HTML entities to get exact raw text.
+            function decodeHtmlEntities(str) {
+                if (!str) return '';
+                const textarea = document.createElement('textarea');
+                textarea.innerHTML = str;
+                return textarea.value;
+            }
+            
+            const finalButtons = document.querySelectorAll('.copy-value-btn');
+            finalButtons.forEach(btn => {
+                // remove existing listener to avoid duplicates (but there are none yet)
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                // get the escaped value and decode it
+                const escapedVal = newBtn.getAttribute('data-copy-value');
+                let realValue = '';
+                if (escapedVal) {
+                    realValue = decodeHtmlEntities(escapedVal);
+                } else {
+                    // fallback: try to extract from neighboring text? but not needed
+                    realValue = '';
+                }
+                newBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const originalInner = newBtn.innerHTML;
+                    try {
+                        await navigator.clipboard.writeText(realValue);
+                        newBtn.innerHTML = '✅ Copied!';
+                        newBtn.classList.add('copied');
+                        setTimeout(() => {
+                            newBtn.innerHTML = originalInner;
+                            newBtn.classList.remove('copied');
+                        }, 1200);
+                    } catch(err) {
+                        newBtn.innerHTML = '❌ Fail';
+                        setTimeout(() => {
+                            newBtn.innerHTML = originalInner;
+                        }, 900);
+                    }
+                });
+            });
+        }
+
+        // Update all: parse current window location and re-render table
+        function refreshFromCurrentUrl() {
+            const search = window.location.search;
+            const params = parseAllGetParams(search);
+            renderParametersTable(params);
+        }
+
+        // listen to popstate for history back/forward
+        window.addEventListener('popstate', () => {
+            refreshFromCurrentUrl();
+        });
+
+        // initial render
+        refreshFromCurrentUrl();
+
+        // If any programmatic URL change occurs via pushState (rare but we can also observe)
+        // provide an exposed helper but it's fine.
+        console.log('✅ Ready — each value has its own copy button (includes array items)');
+    })();
+</script>
+</body>
+</html>
