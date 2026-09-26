@@ -1,257 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta property="og:title" content="Test" />
-<meta property="og:description" content="This is a test embed" />
-<!-- Optional: Add a URL and Image for a better embed -->
-<meta property="og:url" content="https://2012hhh2012.github.io" />
-<meta property="og:image" content="https://2012hhh2012.github.io/media/2012hhh2012.png" />
-<!-- Optional: Add a color for the left border (Discord often uses theme-color too) -->
-<meta name="theme-color" content="#333" />
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2012hhh2012's site</title>
-<style>
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        line-height: 1.6;
-        color: #333;
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #f6f8fa;
-    }
-    h1, h2 {
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 0.3em;
-        color: #24292e;
-    }
-    #file-list, #deploy-status {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        padding: 15px;
-        margin-bottom: 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    ul {
-        list-style-type: none;
-        padding-left: 20px;
-    }
-    li {
-        padding: 4px 0;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-    }
-    .icon {
-        margin-right: 8px;
-        font-size: 1.1em;
-    }
-    a {
-        color: #0366d6;
-        text-decoration: none;
-    }
-    a:hover {
-        text-decoration: underline;
-    }
-    .dir-icon:before { content: '📁'; }
-    .file-icon:before { content: '📄'; }
-    .download-btn {
-        margin-left: auto;
-        font-size: 0.9em;
-        padding: 2px 6px;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        background-color: #fafafa;
-    }
-    .status-success { color: #28a745; font-weight: bold; }
-    .status-failure { color: #dc3545; font-weight: bold; }
-    .status-in-progress { color: #ffc107; font-weight: bold; }
-    .status-pending { color: #6c757d; font-weight: bold; }
-    .loading { color: #0366d6; }
-    .nested { display: none; }
-    .expanded > .nested { display: block; }
-    .lfs-badge {
-        display: inline-block;
-        background-color: #6f42c1; /* GitHub purple */
-        color: white;
-        font-size: 10px;
-        font-weight: bold;
-        padding: 0 4px;
-        border-radius: 3px;
-        margin-left: 4px;
-        line-height: 1.2;
-        vertical-align: text-bottom;
-        font-family: Arial, sans-serif;
-    }
-</style>
+    <meta property="og:title" content="Test" />
+    <meta property="og:description" content="This is a test embed" />
+    <!-- Optional: Add a URL and Image for a better embed -->
+    <meta property="og:url" content="https://2012hhh2012.github.io" />
+    <meta property="og:image" content="https://2012hhh2012.github.io/media/2012hhh2012.png" />
+    <!-- Optional: Add a color for the left border (Discord often uses theme-color too) -->
+    <meta name="theme-color" content="#333" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2012hhh2012's site</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
-<h1>Repository File Structure</h1>
+    <h1>Repository File Structure</h1>
 
-<div id="deploy-status">
-    <p class="loading">Loading last deployment status...</p>
-</div>
+    <div id="deploy-status">
+        <p class="loading">Loading last deployment status...</p>
+    </div>
 
-<div id="file-list">
-    <p class="loading">Loading file structure...</p>
-</div>
+    <div id="file-list">
+        <p class="loading">Loading file structure...</p>
+    </div>
 
-<p><em>Note: This content is dynamically loaded using the GitHub API and requires the repository to be public.</em></p>
+    <p><em>Note: This content is dynamically loaded using the GitHub API and requires the repository to be public.</em>
+    </p>
 
-<script>
-const GITHUB_USERNAME = '2012hhh2012';
-const REPO_NAME = '2012hhh2012.github.io';
-const BRANCH_NAME = 'main';
-const API_BASE_URL = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents`;
-
-// --- IGNORE LIST (like .gitignore) ---
-const IGNORE = [
-    '.gitattributes',
-    '.git',
-    'index.html',
-    'index2.html',
-    'TurboConnect.sb3',
-    'funny.png'
-];
-
-// --- Fetch and display expandable file tree ---
-async function fetchAndDisplayFileStructure(path = '', parentUl = null) {
-    const url = path ? `${API_BASE_URL}/${path}?ref=${BRANCH_NAME}` : `${API_BASE_URL}?ref=${BRANCH_NAME}`;
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const files = await response.json();
-        if (!Array.isArray(files)) throw new Error('Invalid response');
-
-        files.sort((a, b) => {
-            if(a.type === 'dir' && b.type !== 'dir') return -1;
-            if(a.type !== 'dir' && b.type === 'dir') return 1;
-            return a.name.localeCompare(b.name);
-        });
-
-        const ul = parentUl || document.createElement('ul');
-        if (!parentUl) document.getElementById('file-list').innerHTML = '<h2>Root Folder (/) Contents</h2>';
-
-        files.forEach(async item => {
-            if (IGNORE.includes(item.name)) return;
-
-            const li = document.createElement('li');
-            const isDir = item.type === 'dir';
-            let isLFS = false;
-            let downloadUrl = '';
-
-            if (!isDir) {
-                // Try to detect LFS pointer
-                if (!item.download_url) {
-                    // If no download_url, assume it could be LFS
-                    downloadUrl = `https://media.githubusercontent.com/media/${GITHUB_USERNAME}/${REPO_NAME}/${BRANCH_NAME}/${item.path}`;
-                    isLFS = true;
-                } else {
-                    // Fetch small file content to check for LFS pointer
-                    try {
-                        const contentResp = await fetch(item.download_url);
-                        if (contentResp.ok) {
-                            const text = await contentResp.text();
-                            if (text.startsWith('version https://git-lfs.github.com/spec/v1')) {
-                                isLFS = true;
-                                downloadUrl = `https://media.githubusercontent.com/media/${GITHUB_USERNAME}/${REPO_NAME}/${BRANCH_NAME}/${item.path}`;
-                            } else {
-                                downloadUrl = item.download_url;
-                            }
-                        } else {
-                            downloadUrl = item.download_url;
-                        }
-                    } catch (err) {
-                        console.warn('Could not check LFS for', item.name, err);
-                        downloadUrl = item.download_url;
-                    }
-                }
-            }
-
-            li.innerHTML = `
-                <span class="icon ${isDir ? 'dir-icon' : 'file-icon'}"></span>
-                <a href="${isDir ? '#' : item.html_url}" target="${isDir ? '' : '_blank'}">
-                    ${item.name}${isDir ? '/' : ''}
-                    ${isLFS ? '<span style="color:#6f42c1;font-weight:bold;margin-left:6px;">[LFS]</span>' : ''}
-                </a>
-                ${!isDir && downloadUrl ? `<a href="${downloadUrl}" class="download-btn" download="${item.name}">Download</a>` : ''}
-            `;
-
-            if (isDir) {
-                const nestedUl = document.createElement('ul');
-                nestedUl.classList.add('nested');
-                li.appendChild(nestedUl);
-
-                li.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    li.classList.toggle('expanded');
-                    if (!nestedUl.hasChildNodes()) {
-                        await fetchAndDisplayFileStructure(item.path, nestedUl);
-                    }
-                });
-            }
-
-            ul.appendChild(li);
-        });
-
-        if (!parentUl) document.getElementById('file-list').appendChild(ul);
-
-    } catch (error) {
-        console.error('Error fetching file structure:', error);
-        if (!parentUl) document.getElementById('file-list').innerHTML = `<p class="status-failure">Failed to load file structure: ${error.message}</p>`;
-    }
-}
-
-// --- Fetch and display last deployment ---
-async function fetchAndDisplayLastDeploy() {
-    const deployStatusDiv = document.getElementById('deploy-status');
-    const workflowsUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/actions/runs?branch=${BRANCH_NAME}&per_page=1`;
-
-    try {
-        const response = await fetch(workflowsUrl);
-        if (!response.ok) {
-            deployStatusDiv.innerHTML = `<p><strong>Last Deploy Status:</strong> Not configured or repository private. (HTTP ${response.status})</p>`;
-            return;
-        }
-        const data = await response.json();
-        if (data.workflow_runs?.length > 0) {
-            const latestRun = data.workflow_runs[0];
-            const statusClass = getStatusClass(latestRun.conclusion);
-            const date = new Date(latestRun.created_at).toLocaleString();
-            deployStatusDiv.innerHTML = `
-                <h2>Last Deployment Status</h2>
-                <p><strong>Status:</strong> <span class="${statusClass}">${latestRun.conclusion || 'In Progress'}</span></p>
-                <p><strong>Workflow:</strong> ${latestRun.name}</p>
-                <p><strong>Triggered At:</strong> ${date}</p>
-                <p><strong>Check Run:</strong> <a href="${latestRun.html_url}" target="_blank">View Run Details</a></p>
-            `;
-        } else {
-            deployStatusDiv.innerHTML = `<p><strong>Last Deployment Status:</strong> No recent workflow runs found.</p>`;
-        }
-    } catch (error) {
-        console.error('Error fetching deployment status:', error);
-        deployStatusDiv.innerHTML = `<p class="status-failure">Failed to load deployment status: ${error.message}</p>`;
-    }
-}
-
-function getStatusClass(conclusion) {
-    if (!conclusion) return 'status-in-progress';
-    switch (conclusion.toLowerCase()) {
-        case 'success': return 'status-success';
-        case 'failure': return 'status-failure';
-        case 'cancelled': return 'status-pending';
-        default: return 'status-in-progress';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    fetchAndDisplayFileStructure();
-    fetchAndDisplayLastDeploy();
-});
-</script>
+    <script src="script.js"></script>
 
 </body>
+
 </html>
